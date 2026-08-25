@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freebie Hunter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #d1d5db;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .controls {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+      margin-bottom: 25px;
+    }
+
+    .search {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select, button {
+      padding: 11px 15px;
+      border-radius: 9px;
+      border: 1px solid #d1d5db;
+      background: white;
+      cursor: pointer;
+    }
+
+    .free-button {
+      background: #16a34a;
+      color: white;
+      border: none;
+    }
+
+    .deals {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .deal {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,.07);
+    }
+
+    .deal-image {
+      height: 160px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+    }
+
+    .deal-content {
+      padding: 18px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .deal h3 {
+      margin: 5px 0 10px;
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: bold;
+      color: #16a34a;
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      color: #9ca3af;
+      margin-left: 8px;
+      font-size: 15px;
+    }
+
+    .score {
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .claim {
+      display: block;
+      width: 100%;
+      background: #111827;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 9px;
+      text-decoration: none;
+      margin-top: 15px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 50px;
+      color: #6b7280;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #6b7280;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎁 Freebie Hunter</h1>
+  <p>Find amazing deals. Pay less. Hunt the freebies.</p>
+</header>
+
+<div class="container">
+
+  <div class="controls">
+
+    <input
+      id="search"
+      class="search"
+      type="text"
+      placeholder="Search for freebies, beauty, electronics, home..."
+    >
+
+    <div class="filters">
+
+      <select id="category">
+        <option value="all">All Categories</option>
+        <option value="beauty">Beauty</option>
+        <option value="electronics">Electronics</option>
+        <option value="home">Home</option>
+        <option value="fashion">Fashion</option>
+        <option value="crafts">Crafts</option>
+        <option value="pets">Pets</option>
+      </select>
+
+      <button id="freeOnly" class="free-button">
+        🟢 Free Only
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="deals" class="deals"></div>
+
+</div>
+
+<footer>
+  Freebie Hunter • Personal deal discovery tool
+</footer>
+
+<script>
+
+const deals = [
+
+  {
+    name: "Makeup Brush Set",
+    category: "beauty",
+    price: 0,
+    original: 24.99,
+    score: 96,
+    icon: "💄"
+  },
+
+  {
+    name: "LED Closet Lights",
+    category: "home",
+    price: 0,
+    original: 19.99,
+    score: 94,
+    icon: "💡"
+  },
+
+  {
+    name: "Wireless Charger",
+    category: "electronics",
+    price: 2.49,
+    original: 29.99,
+    score: 91,
+    icon: "📱"
+  },
+
+  {
+    name: "Resin Craft Mold Set",
+    category: "crafts",
+    price: 1.99,
+    original: 18.99,
+    score: 89,
+    icon: "🎨"
+  },
+
+  {
+    name: "Pet Grooming Brush",
+    category: "pets",
+    price: 0,
+    original: 15.99,
+    score: 93,
+    icon: "🐶"
+  },
+
+  {
+    name: "Fashion Sunglasses",
+    category: "fashion",
+    price: 3.99,
+    original: 22.99,
+    score: 87,
+    icon: "🕶️"
+  }
+
+];
+
+let freeOnly = false;
+
+function displayDeals() {
+
+  const search =
+    document.getElementById("search").value.toLowerCase();
+
+  const category =
+    document.getElementById("category").value;
+
+  const container =
+    document.getElementById("deals");
+
+  const filtered = deals.filter(deal => {
+
+    const matchesSearch =
+      deal.name.toLowerCase().includes(search);
+
+    const matchesCategory =
+      category === "all" ||
+      deal.category === category;
+
+    const matchesFree =
+      !freeOnly || deal.price === 0;
+
+    return matchesSearch &&
+          matchesCategory &&
+          matchesFree;
+
+  });
+
+  if (filtered.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No deals found. Try another search.</div>';
+
+    return;
+
+  }
+
+  container.innerHTML = filtered.map(deal => {
+
+    const savings =
+      deal.original - deal.price;
+
+    const price =
+      deal.price === 0
+        ? "FREE"
+        : "$" + deal.price.toFixed(2);
+
+    return `
+
+      <div class="deal">
+
+        <div class="deal-image">
+          ${deal.icon}
+        </div>
+
+        <div class="deal-content">
+
+          <span class="badge">
+            ${deal.price === 0 ? "🔥 FREE" : "💥 DEEP DISCOUNT"}
+          </span>
+
+          <h3>${deal.name}</h3>
+
+          <div class="price">
+            ${price}
+
+            <span class="old-price">
+              $${deal.original.toFixed(2)}
+            </span>
+          </div>
+
+          <div class="score">
+            ⭐ Deal Score: <strong>${deal.score}/100</strong>
+            <br>
+            💰 Estimated Savings:
+            <strong>$${savings.toFixed(2)}</strong>
+          </div>
+
+          <a
+            class="claim"
+            href="#"
+            onclick="alert('Real deal links will be connected in the next step!'); return false;"
+          >
+            Claim Deal →
+          </a>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+
+}
+
+document
+  .getElementById("search")
+  .addEventListener("input", displayDeals);
+
+document
+  .getElementById("category")
+  .addEventListener("change", displayDeals);
+
+document
+  .getElementById("freeOnly")
+  .addEventListener("click", function() {
+
+    freeOnly = !freeOnly;
+
+    this.textContent =
+      freeOnly ? "🔴 Show All Deals" : "🟢 Free Only";
+
+    displayDeals();
+
+  });
+
+displayDeals();
+
+</script>
+
+</body>
+</html>
