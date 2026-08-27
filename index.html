@@ -211,65 +211,44 @@
 
 <script>
 
-const deals = [
+const SUPABASE_URL = "https://romlgsrtdpizenddzecc.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_9403Fliwxn5zlIgd9_vXgQ_Bdm4IxrA";
 
-  {
-    name: "Makeup Brush Set",
-    category: "beauty",
-    price: 0,
-    original: 24.99,
-    score: 96,
-    icon: "💄"
-  },
+let deals = [];
+let freeOnly = false;
 
-  {
-    name: "LED Closet Lights",
-    category: "home",
-    price: 0,
-    original: 19.99,
-    score: 94,
-    icon: "💡"
-  },
+async function loadDeals() {
 
-  {
-    name: "Wireless Charger",
-    category: "electronics",
-    price: 2.49,
-    original: 29.99,
-    score: 91,
-    icon: "📱"
-  },
+  try {
 
-  {
-    name: "Resin Craft Mold Set",
-    category: "crafts",
-    price: 1.99,
-    original: 18.99,
-    score: 89,
-    icon: "🎨"
-  },
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/deals?select=*&verified=eq.true&order=deal_score.desc`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
 
-  {
-    name: "Pet Grooming Brush",
-    category: "pets",
-    price: 0,
-    original: 15.99,
-    score: 93,
-    icon: "🐶"
-  },
+    if (!response.ok) {
+      throw new Error("Could not load deals.");
+    }
 
-  {
-    name: "Fashion Sunglasses",
-    category: "fashion",
-    price: 3.99,
-    original: 22.99,
-    score: 87,
-    icon: "🕶️"
+    deals = await response.json();
+
+    displayDeals();
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById("deals").innerHTML =
+      '<div class="empty">Unable to load deals right now.</div>';
+
   }
 
-];
-
-let freeOnly = false;
+}
 
 function displayDeals() {
 
@@ -292,11 +271,11 @@ function displayDeals() {
       deal.category === category;
 
     const matchesFree =
-      !freeOnly || deal.price === 0;
+      !freeOnly || Number(deal.deal_price) === 0;
 
     return matchesSearch &&
-          matchesCategory &&
-          matchesFree;
+           matchesCategory &&
+           matchesFree;
 
   });
 
@@ -311,49 +290,63 @@ function displayDeals() {
 
   container.innerHTML = filtered.map(deal => {
 
-    const savings =
-      deal.original - deal.price;
+    const original =
+      Number(deal.original_price);
 
     const price =
-      deal.price === 0
+      Number(deal.deal_price);
+
+    const savings =
+      original - price;
+
+    const priceDisplay =
+      price === 0
         ? "FREE"
-        : "$" + deal.price.toFixed(2);
+        : "$" + price.toFixed(2);
 
     return `
 
       <div class="deal">
 
         <div class="deal-image">
-          ${deal.icon}
+          🎁
         </div>
 
         <div class="deal-content">
 
           <span class="badge">
-            ${deal.price === 0 ? "🔥 FREE" : "💥 DEEP DISCOUNT"}
+            ${price === 0 ? "🔥 FREE" : "💥 DEEP DISCOUNT"}
           </span>
 
           <h3>${deal.name}</h3>
 
           <div class="price">
-            ${price}
+
+            ${priceDisplay}
 
             <span class="old-price">
-              $${deal.original.toFixed(2)}
+              $${original.toFixed(2)}
             </span>
+
           </div>
 
           <div class="score">
-            ⭐ Deal Score: <strong>${deal.score}/100</strong>
+
+            ⭐ Deal Score:
+            <strong>${deal.deal_score}/100</strong>
+
             <br>
+
             💰 Estimated Savings:
             <strong>$${savings.toFixed(2)}</strong>
+
           </div>
 
           <a
             class="claim"
-            href="#"
-            onclick="alert('Real deal links will be connected in the next step!'); return false;"
+            href="${deal.deal_url}"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Claim Deal →
           </a>
@@ -383,13 +376,16 @@ document
     freeOnly = !freeOnly;
 
     this.textContent =
-      freeOnly ? "🔴 Show All Deals" : "🟢 Free Only";
+      freeOnly
+        ? "🔴 Show All Deals"
+        : "🟢 Free Only";
 
     displayDeals();
 
   });
 
-displayDeals();
+loadDeals();
+
 
 </script>
 
